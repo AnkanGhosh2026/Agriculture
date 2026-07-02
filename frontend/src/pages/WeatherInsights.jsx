@@ -12,29 +12,31 @@ export default function WeatherInsights() {
       setError('Please provide a location to search.');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
     setData(null);
-    
+
     try {
       // 1. Geocode the location using OpenStreetMap Nominatim
       const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(locationSearch)}&format=json&limit=1`);
       if (!geoRes.ok) throw new Error('Failed to search for location.');
-      
+
       const geoData = await geoRes.json();
       if (!geoData || geoData.length === 0) {
         throw new Error('Location not found. Please try a different search term.');
       }
-      
+
       const lat = geoData[0].lat;
       const lon = geoData[0].lon;
       const displayName = geoData[0].display_name.split(',')[0];
 
       // 2. Fetch weather insights from backend
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/weather/insights?latitude=${lat}&longitude=${lon}`);
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/v1/weather/insights?latitude=${lat}&longitude=${lon}`
+      );
       if (!res.ok) throw new Error('Failed to fetch weather insights from backend.');
-      
+
       const json = await res.json();
       // Use the friendly city name instead of lat/lon string
       json.location = displayName;
@@ -56,17 +58,17 @@ export default function WeatherInsights() {
       <div className="glass-panel card">
         <div style={{ marginBottom: '20px' }}>
           <label>Location Search</label>
-          <input 
-            type="text" 
-            placeholder="e.g. London, Mumbai, New York..." 
-            value={locationSearch} 
+          <input
+            type="text"
+            placeholder="e.g. London, Mumbai, New York..."
+            value={locationSearch}
             onChange={(e) => setLocationSearch(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && fetchWeather()}
           />
         </div>
-        
-        <button 
-          className="btn" 
+
+        <button
+          className="btn"
           onClick={fetchWeather}
           disabled={loading || !locationSearch}
           style={{ width: '100%' }}
@@ -90,7 +92,7 @@ export default function WeatherInsights() {
                 {data.current_condition}
               </div>
             </div>
-            
+
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '16px', marginBottom: '30px' }}>
               <div className="glass-panel" style={{ padding: '20px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                 <Thermometer size={32} color="var(--accent)" style={{ marginBottom: '12px' }} />
@@ -98,14 +100,14 @@ export default function WeatherInsights() {
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Current Temp</div>
               </div>
               <div className="glass-panel" style={{ padding: '20px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                 <h4 style={{ color: 'var(--secondary-color)', marginBottom: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
-                   <Sun size={18} /> Farming Advisory
-                 </h4>
-                 <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6', fontSize: '0.95rem' }}>
-                   {data.farming_advisory.map((adv, i) => (
-                     <li key={i} style={{ marginBottom: '8px' }}>{adv}</li>
-                   ))}
-                 </ul>
+                <h4 style={{ color: 'var(--secondary-color)', marginBottom: '12px', display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <Sun size={18} /> Farming Advisory
+                </h4>
+                <ul style={{ margin: 0, paddingLeft: '20px', lineHeight: '1.6', fontSize: '0.95rem' }}>
+                  {data.farming_advisory.map((adv, i) => (
+                    <li key={i} style={{ marginBottom: '8px' }}>{adv}</li>
+                  ))}
+                </ul>
               </div>
             </div>
 

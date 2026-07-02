@@ -34,23 +34,23 @@ export default function DiseaseDetection() {
 
   const analyzeImage = async () => {
     if (!file) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     const formData = new FormData();
     formData.append('file', file);
     if (cropType) formData.append('crop_type', cropType);
 
     try {
       // In production, configure CORS/proxy correctly
-      const res = await fetch('http://127.0.0.1:8000/api/v1/disease-detection/predict', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/disease-detection/predict`, {
         method: 'POST',
         body: formData,
       });
-      
+
       if (!res.ok) throw new Error('Analysis failed. Please try again.');
-      
+
       const data = await res.json();
       setResults(data);
     } catch (err) {
@@ -69,18 +69,18 @@ export default function DiseaseDetection() {
 
       <div className="glass-panel card">
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px' }}>
-          
+
           <div>
             <label>Crop Type (Optional)</label>
-            <input 
-              type="text" 
-              placeholder="e.g. Tomato, Apple, Corn..." 
+            <input
+              type="text"
+              placeholder="e.g. Tomato, Apple, Corn..."
               value={cropType}
               onChange={(e) => setCropType(e.target.value)}
               style={{ marginBottom: '20px' }}
             />
 
-            <div 
+            <div
               className="upload-zone"
               onDragOver={handleDragOver}
               onDrop={handleDrop}
@@ -89,18 +89,18 @@ export default function DiseaseDetection() {
               <UploadCloud size={48} color="var(--primary-color)" style={{ marginBottom: '16px' }} />
               <p>Drag and drop an image here, or <strong>click to browse</strong></p>
               <p style={{ fontSize: '0.85rem', marginTop: '8px' }}>Supports JPG, PNG</p>
-              <input 
-                type="file" 
-                ref={fileInputRef} 
-                onChange={handleFileChange} 
-                accept="image/jpeg, image/png" 
-                style={{ display: 'none' }} 
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileChange}
+                accept="image/jpeg, image/png"
+                style={{ display: 'none' }}
               />
             </div>
-            
-            <button 
-              className="btn" 
-              onClick={analyzeImage} 
+
+            <button
+              className="btn"
+              onClick={analyzeImage}
               disabled={!file || loading}
               style={{ width: '100%', marginTop: '20px' }}
             >
@@ -133,10 +133,10 @@ export default function DiseaseDetection() {
             <h3 style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CheckCircle2 color="var(--primary-color)" /> Analysis Results
             </h3>
-            
+
             <p><strong>Status:</strong> {results.is_healthy ? <span style={{ color: 'var(--primary-color)' }}>Healthy</span> : <span style={{ color: 'var(--accent)' }}>Disease Detected</span>}</p>
             <p><strong>Model:</strong> {results.model_version}</p>
-            
+
             <div style={{ marginTop: '20px' }}>
               <h4>Top Predictions</h4>
               {results.predictions.slice(0, 3).map((pred, i) => (
@@ -146,18 +146,18 @@ export default function DiseaseDetection() {
                     <span style={{ fontWeight: 'bold' }}>{(pred.confidence * 100).toFixed(1)}%</span>
                   </div>
                   <div className="result-bar-container">
-                    <div 
-                      className="result-bar" 
-                      style={{ 
+                    <div
+                      className="result-bar"
+                      style={{
                         width: `${pred.confidence * 100}%`,
                         background: i === 0 ? (pred.is_healthy ? 'var(--primary-color)' : 'var(--accent)') : '#555'
-                      }} 
+                      }}
                     />
                   </div>
                 </div>
               ))}
             </div>
-            
+
             {!results.is_healthy && results.predictions[0].treatment_recommendation && (
               <div style={{ marginTop: '20px', padding: '16px', background: 'rgba(255, 179, 0, 0.1)', borderLeft: '4px solid var(--accent)', borderRadius: '4px' }}>
                 <h4>Recommended Action</h4>

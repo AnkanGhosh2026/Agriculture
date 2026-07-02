@@ -166,7 +166,7 @@ export default function YieldPrediction() {
     setError(null);
 
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/yield-prediction/predict', {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/v1/yield-prediction/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
