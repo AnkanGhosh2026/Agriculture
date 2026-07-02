@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+venv/
+env/
+.venv/
+
+# Env
+.env
+
+# ML artifacts / large files
+*.pkl
+*.h5
+*.pt
+*.pth
+backend/app/ml/artifacts/
+
+# Data
+data/raw/*
+data/processed/*
+data/external/*
+!data/**/.gitkeep
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
